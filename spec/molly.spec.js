@@ -139,7 +139,6 @@
         var callback;
         callback = jasmine.createSpy();
         spyOn(molly.url_handler, 'hash').andReturn('#hello-world');
-        spyOn(molly.url_handler, 'path').andReturn('/users/123');
         this.app.route('#hello-world', callback);
         this.app.run();
         return expect(callback).toHaveBeenCalled();
@@ -148,7 +147,6 @@
         var callback;
         callback = jasmine.createSpy();
         spyOn(molly.url_handler, 'hash').andReturn('#users/123');
-        spyOn(molly.url_handler, 'path').andReturn('/users/123');
         this.app.route('#users/:id', callback);
         this.app.run();
         return expect(callback).toHaveBeenCalledWith('123');
@@ -198,18 +196,35 @@
       it('should have a run function', function() {
         return expect(typeof this.app.run).toBe('function');
       });
-      return it('should find the current url path', function() {
-        spyOn(molly.url_handler, 'path');
+      it('should find the current url path', function() {
+        spyOn(molly.url_handler, 'path').andReturn('/');
+        spyOn(molly.events, 'trigger');
         this.app.run();
-        return expect(molly.url_handler.path).toHaveBeenCalled();
+        expect(molly.url_handler.path).toHaveBeenCalled();
+        return expect(molly.events.trigger).toHaveBeenCalledWith('/');
+      });
+      return it('should find the current url hash', function() {
+        spyOn(molly.url_handler, 'hash').andReturn('#hello');
+        spyOn(molly.events, 'trigger');
+        this.app.run();
+        expect(molly.url_handler.hash).toHaveBeenCalled();
+        return expect(molly.events.trigger).toHaveBeenCalledWith('#hello');
       });
     });
     return describe('url_handler', function() {
       it('should have a url_handler object', function() {
         return expect(typeof molly.url_handler).toBe('object');
       });
-      return it('should have a path method', function() {
+      it('should have a path method', function() {
         return expect(typeof molly.url_handler.path).toBe('function');
+      });
+      it('should have a hash method', function() {
+        return expect(typeof molly.url_handler.hash).toBe('function');
+      });
+      return it('should trigger an event when hash changes', function() {
+        spyOn(molly.events, 'trigger');
+        molly.url_handler.hash('#hello');
+        return expect(molly.events.trigger).toHaveBeenCalledWith('#hello');
       });
     });
   });

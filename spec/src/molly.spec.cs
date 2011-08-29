@@ -148,7 +148,6 @@ describe 'molly', () ->
         it 'should allow mapping to hashes', () ->
             callback = jasmine.createSpy()
             spyOn(molly.url_handler, 'hash').andReturn '#hello-world'
-            spyOn(molly.url_handler, 'path').andReturn '/users/123'
 
             @app.route '#hello-world', callback
             @app.run()
@@ -158,13 +157,11 @@ describe 'molly', () ->
         it 'should allow url parameters in hash urls', () ->
             callback = jasmine.createSpy()
             spyOn(molly.url_handler, 'hash').andReturn '#users/123'
-            spyOn(molly.url_handler, 'path').andReturn '/users/123'
 
             @app.route '#users/:id', callback
             @app.run()
 
             expect(callback).toHaveBeenCalledWith('123')
-            
 
 
     describe 'resource', () ->
@@ -210,10 +207,20 @@ describe 'molly', () ->
             expect(typeof @app.run).toBe 'function'
 
         it 'should find the current url path', () ->
-            spyOn(molly.url_handler, 'path')
+            spyOn(molly.url_handler, 'path').andReturn '/'
+            spyOn(molly.events, 'trigger')
             @app.run()
 
             expect(molly.url_handler.path).toHaveBeenCalled()
+            expect(molly.events.trigger).toHaveBeenCalledWith('/')
+
+        it 'should find the current url hash', () ->
+            spyOn(molly.url_handler, 'hash').andReturn '#hello'
+            spyOn(molly.events, 'trigger')
+            @app.run()
+
+            expect(molly.url_handler.hash).toHaveBeenCalled()
+            expect(molly.events.trigger).toHaveBeenCalledWith('#hello')
 
 
     describe 'url_handler', () ->
@@ -223,3 +230,12 @@ describe 'molly', () ->
 
         it 'should have a path method', () ->
             expect(typeof molly.url_handler.path).toBe 'function'
+
+        it 'should have a hash method', () ->
+            expect(typeof molly.url_handler.hash).toBe 'function'
+
+        it 'should trigger an event when hash changes', () ->
+            spyOn(molly.events, 'trigger')
+            molly.url_handler.hash '#hello'
+
+            expect(molly.events.trigger).toHaveBeenCalledWith '#hello'
