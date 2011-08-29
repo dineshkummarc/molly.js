@@ -80,7 +80,7 @@ jasmine.MessageResult = function(values) {
 
 jasmine.MessageResult.prototype.toString = function() {
   var text = "";
-  for(var i = 0; i < this.values.length; i++) {
+  for (var i = 0; i < this.values.length; i++) {
     if (i > 0) text += " ";
     if (jasmine.isString_(this.values[i])) {
       text += this.values[i];
@@ -97,9 +97,10 @@ jasmine.ExpectationResult = function(params) {
   this.passed_ = params.passed;
   this.expected = params.expected;
   this.actual = params.actual;
-
   this.message = this.passed_ ? 'Passed.' : params.message;
-  this.trace = this.passed_ ? '' : new Error(this.message);
+
+  var trace = (params.trace || new Error(this.message));
+  this.trace = this.passed_ ? '' : trace;
 };
 
 jasmine.ExpectationResult.prototype.toString = function () {
@@ -125,7 +126,7 @@ jasmine.getEnv = function() {
  * @returns {Boolean}
  */
 jasmine.isArray_ = function(value) {
-  return jasmine.isA_("Array", value);  
+  return jasmine.isA_("Array", value);
 };
 
 /**
@@ -593,17 +594,25 @@ jasmine.XmlHttpRequest = (typeof XMLHttpRequest == "undefined") ? function() {
     try {
       return f();
     } catch(e) {
-    }    
+    }
     return null;
   }
-  
-  var xhr = tryIt(function(){return new ActiveXObject("Msxml2.XMLHTTP.6.0");}) ||
-            tryIt(function(){return new ActiveXObject("Msxml2.XMLHTTP.3.0");}) ||
-            tryIt(function(){return new ActiveXObject("Msxml2.XMLHTTP");}) ||
-            tryIt(function(){return new ActiveXObject("Microsoft.XMLHTTP");});
+
+  var xhr = tryIt(function() {
+    return new ActiveXObject("Msxml2.XMLHTTP.6.0");
+  }) ||
+    tryIt(function() {
+      return new ActiveXObject("Msxml2.XMLHTTP.3.0");
+    }) ||
+    tryIt(function() {
+      return new ActiveXObject("Msxml2.XMLHTTP");
+    }) ||
+    tryIt(function() {
+      return new ActiveXObject("Microsoft.XMLHTTP");
+    });
 
   if (!xhr) throw new Error("This browser does not support XMLHttpRequest.");
-  
+
   return xhr;
 } : XMLHttpRequest;
 /**
@@ -726,12 +735,17 @@ jasmine.Env.prototype.version = function () {
  * @returns string containing jasmine version build info, if set.
  */
 jasmine.Env.prototype.versionString = function() {
-  if (jasmine.version_) {
-    var version = this.version();
-    return version.major + "." + version.minor + "." + version.build + " revision " + version.revision;
-  } else {
+  if (!jasmine.version_) {
     return "version unknown";
   }
+
+  var version = this.version();
+  var versionString = version.major + "." + version.minor + "." + version.build;
+  if (version.release_candidate) {
+    versionString += ".rc" + version.release_candidate;
+  }
+  versionString += " revision " + version.revision;
+  return versionString;
 };
 
 /**
@@ -779,13 +793,13 @@ jasmine.Env.prototype.describe = function(description, specDefinitions) {
     declarationError = e;
   }
 
-  this.currentSuite = parentSuite;
-
   if (declarationError) {
     this.it("encountered a declaration exception", function() {
       throw declarationError;
     });
   }
+
+  this.currentSuite = parentSuite;
 
   return suite;
 };
@@ -1324,13 +1338,13 @@ jasmine.Matchers.prototype.toHaveBeenCalledWith = function() {
     if (this.actual.callCount === 0) {
       // todo: what should the failure message for .not.toHaveBeenCalledWith() be? is this right? test better. [xw]
       return [
-        "Expected spy to have been called with " + jasmine.pp(expectedArgs) + " but it was never called.",
-        "Expected spy not to have been called with " + jasmine.pp(expectedArgs) + " but it was."
+        "Expected spy " + this.actual.identity + " to have been called with " + jasmine.pp(expectedArgs) + " but it was never called.",
+        "Expected spy " + this.actual.identity + " not to have been called with " + jasmine.pp(expectedArgs) + " but it was."
       ];
     } else {
       return [
-        "Expected spy to have been called with " + jasmine.pp(expectedArgs) + " but was called with " + jasmine.pp(this.actual.argsForCall),
-        "Expected spy not to have been called with " + jasmine.pp(expectedArgs) + " but was called with " + jasmine.pp(this.actual.argsForCall)
+        "Expected spy " + this.actual.identity + " to have been called with " + jasmine.pp(expectedArgs) + " but was called with " + jasmine.pp(this.actual.argsForCall),
+        "Expected spy " + this.actual.identity + " not to have been called with " + jasmine.pp(expectedArgs) + " but was called with " + jasmine.pp(this.actual.argsForCall)
       ];
     }
   };
@@ -1383,6 +1397,23 @@ jasmine.Matchers.prototype.toBeLessThan = function(expected) {
 
 jasmine.Matchers.prototype.toBeGreaterThan = function(expected) {
   return this.actual > expected;
+};
+
+/**
+ * Matcher that checks that the expected item is equal to the actual item
+ * up to a given level of decimal precision (default 2).
+ *
+ * @param {Number} expected
+ * @param {Number} precision
+ */
+jasmine.Matchers.prototype.toBeCloseTo = function(expected, precision) {
+  if (!(precision === 0)) {
+    precision = precision || 2;
+  }
+  var multiplier = Math.pow(10, precision);
+  var actual = Math.round(this.actual * multiplier);
+  expected = Math.round(expected * multiplier);
+  return expected == actual;
 };
 
 /**
@@ -1982,7 +2013,8 @@ jasmine.Spec.prototype.waitsFor = function(latchFunction, optional_timeoutMessag
 jasmine.Spec.prototype.fail = function (e) {
   var expectationResult = new jasmine.ExpectationResult({
     passed: false,
-    message: e ? jasmine.util.formatException(e) : 'Exception'
+    message: e ? jasmine.util.formatException(e) : 'Exception',
+    trace: { stack: e.stack }
   });
   this.results_.addResult(expectationResult);
 };
@@ -2436,10 +2468,10 @@ jasmine.getGlobal().clearInterval = function(timeoutKey) {
   }
 };
 
-
 jasmine.version_= {
   "major": 1,
   "minor": 1,
   "build": 0,
-  "revision": 1304737707
+  "revision": 1310556152,
+  "release_candidate": 3
 };
