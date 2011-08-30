@@ -16,7 +16,7 @@ Using a constructor function.
 
             '/:id': (id) -> 
                 console.log "You're user number #{id}"
-
+        
         @resource 'users',
             index: -> 
                 console.log "all users"
@@ -24,7 +24,7 @@ Using a constructor function.
             show: (id) -> 
                 console.log "You're user number #{id}"
 
-Or call `route` on an app instance.
+Or call methods on an app instance.
 
     app = molly()
 
