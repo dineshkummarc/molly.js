@@ -1,3 +1,5 @@
+Simple routing for client-side apps.
+
 ## Usage
 
 Using a constructor function.
@@ -16,6 +18,12 @@ Using a constructor function.
 
             '/:id': (id) -> 
                 console.log "You're user number #{id}"
+
+            '/:id/edit': (id) ->
+                console.log "Do you want to edit user #{id}"
+
+            '/:id/destroy': (id) ->
+                console.log "Do you want to delete user #{id}"
         
         @resource 'users',
             index: -> 
@@ -26,6 +34,9 @@ Using a constructor function.
 
             edit: (id) ->
                 console.log "Do you want to edit user #{id}"
+
+            destroy: (id) ->
+                console.log "Do you want to delete user #{id}"
                 
 
 Or call methods on an app instance.
@@ -46,12 +57,24 @@ Or call methods on an app instance.
         '/:id': (id) -> 
             console.log "You're user number #{id}"
 
+        '/:id/edit': (id) ->
+            console.log "Do you want to edit user #{id}"
+
+        '/:id/destroy': (id) ->
+            console.log "Do you want to delete user #{id}"
+
     app.resource 'users',
         index: -> 
             console.log "all users"
 
         show: (id) -> 
             console.log "You're user number #{id}"
+
+        edit: (id) ->
+            console.log "Do you want to edit user #{id}"
+
+        destroy: (id) ->
+            console.log "Do you want to delete user #{id}"
 
 
     app.run()
