@@ -24,6 +24,10 @@ Using a constructor function.
             show: (id) -> 
                 console.log "You're user number #{id}"
 
+            edit: (id) ->
+                console.log "Do you want to edit user #{id}"
+                
+
 Or call methods on an app instance.
 
     app = molly()
