@@ -11,12 +11,18 @@ Using a constructor function.
             console.log "You're user number #{id}"
 
         @route 'users',
-            '/': -> console.log "all users"
-            '/:id': (id) -> console.log "You're user number #{id}"
+            '/': -> 
+                console.log "all users"
+
+            '/:id': (id) -> 
+                console.log "You're user number #{id}"
 
         @resource 'users',
-            index: -> console.log "all users"
-            show: (id) -> console.log "You're user number #{id}"
+            index: -> 
+                console.log "all users"
+
+            show: (id) -> 
+                console.log "You're user number #{id}"
 
 Or call `route` on an app instance.
 
@@ -30,12 +36,18 @@ Or call `route` on an app instance.
         console.log "You're user number #{id}"
 
     app.route 'users',
-        '/': -> console.log "all users"
-        '/:id': (id) -> console.log "You're user number #{id}"
+        '/': -> 
+            console.log "all users"
+
+        '/:id': (id) -> 
+            console.log "You're user number #{id}"
 
     app.resource 'users',
-        index: -> console.log "all users"
-        show: (id) -> console.log "You're user number #{id}"
+        index: -> 
+            console.log "all users"
+
+        show: (id) -> 
+            console.log "You're user number #{id}"
 
 
     app.run()
