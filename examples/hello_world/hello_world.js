@@ -1,50 +1,14 @@
-molly () ->
-
-    @route '/', () ->
-        console.log 'Hello world'
-        @redirect '/users/new'
-
-
-    @route '/users',
-        '/': () ->
-            console.log 'all users'
-
-        '/:id': (user) ->
-            @session.user = user
-            @redirect url 'users/{{ user }}'
-
-
-    @resource 'users',
-        'index': () -> console.log 'all users'
-        'show': (user) -> console.log user
-
-
-app = molly()
-
-
-app.route '/', () ->
-    console.log 'Hello world'
-
-
-app.route '/:user', (user) ->
-    console.log user
-
-
-app.route '/users'
-
-    '/': () ->
-        console.log 'Hello users'
-
-    '/:user': (user) ->
-        console.log 'Hello #{ user }'
-
-
-app.resource 'users',
-
-    'index': () ->
-        console.log 'Hello users'
-
-    'show': (user) ->
-        console.log 'Hello #{ user }'
-
-app.run()
+(function() {
+  var app;
+  app = molly(function() {
+    this.route('/examples/hello_world/', function() {
+      return alert('hello');
+    });
+    this.route('/examples/hello_world/users/', function() {
+      return alert('Viewing all users');
+    });
+    return this.route('/examples/hello_world/users/:id', function(id) {
+      return alert("Viewing user: " + id);
+    });
+  });
+}).call(this);

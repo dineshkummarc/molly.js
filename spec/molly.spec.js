@@ -55,6 +55,19 @@
         this.app.run();
         return expect(callback).not.toHaveBeenCalled();
       });
+      it('should only call the current route', function() {
+        var callback1, callback2;
+        callback1 = jasmine.createSpy();
+        callback2 = jasmine.createSpy();
+        spyOn(molly.url_handler, 'path').andReturn('/users/123');
+        this.app.route({
+          '/users': callback1,
+          '/users/123': callback2
+        });
+        this.app.run();
+        expect(callback1).not.toHaveBeenCalled();
+        return expect(callback2).toHaveBeenCalled();
+      });
       it('should route multiple urls if passed an object', function() {
         var callback1, callback2;
         callback1 = jasmine.createSpy();
@@ -91,31 +104,11 @@
         this.app.run();
         return expect(callback2).toHaveBeenCalled();
       });
-      it('should route remove trailing slashes to namespaced urls', function() {
-        var callback1, callback2;
-        callback1 = jasmine.createSpy();
-        callback2 = jasmine.createSpy();
-        spyOn(molly.url_handler, 'path').andReturn('/users/foo');
-        this.app.route('/users', {
-          '/': callback1,
-          '/foo/': callback2
-        });
-        this.app.run();
-        return expect(callback2).toHaveBeenCalled();
-      });
       it('should add a leading slash if missing', function() {
         var callback;
         callback = jasmine.createSpy();
         spyOn(molly.url_handler, 'path').andReturn('/foo');
         this.app.route('foo', callback);
-        this.app.run();
-        return expect(callback).toHaveBeenCalled();
-      });
-      it('should remove trailing slashes', function() {
-        var callback;
-        callback = jasmine.createSpy();
-        spyOn(molly.url_handler, 'path').andReturn('/foo');
-        this.app.route('/foo/', callback);
         this.app.run();
         return expect(callback).toHaveBeenCalled();
       });
@@ -211,7 +204,7 @@
         return expect(molly.events.trigger).toHaveBeenCalledWith('#hello');
       });
     });
-    return describe('url_handler', function() {
+    describe('url_handler', function() {
       it('should have a url_handler object', function() {
         return expect(typeof molly.url_handler).toBe('object');
       });
@@ -225,6 +218,21 @@
         spyOn(molly.events, 'trigger');
         molly.url_handler.hash('#hello');
         return expect(molly.events.trigger).toHaveBeenCalledWith('#hello');
+      });
+    });
+    return describe('type_match', function() {
+      return it('should call null option if not arguments are provided', function() {
+        var callback, example;
+        callback = jasmine.createSpy();
+        example = function() {
+          return molly.type_match(arguments, {
+            '': function() {
+              return callback();
+            }
+          });
+        };
+        example();
+        return expect(callback).toHaveBeenCalled();
       });
     });
   });

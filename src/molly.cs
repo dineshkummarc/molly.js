@@ -12,7 +12,7 @@
         str.replace /:([\w\d]+)/g, "([^\/]+)"
 
     parse_url = (str) ->
-        add_leading_slash remove_trailing_slash replace_url_arguments str
+        add_leading_slash replace_url_arguments str
 
     exports =
         route: () ->
@@ -56,7 +56,9 @@ molly.events = do ->
         trigger: (path) ->
             for event, callback of events
                 args = path.match?(event)
-                callback.apply this, args[1..args.length] if args?
+                jstestdriver.console.log args, event, path
+                if args?.length
+                    callback.apply this, args[1..args.length]
 
 
 molly.url_handler = do ->
@@ -64,16 +66,15 @@ molly.url_handler = do ->
         molly.events.trigger window.location.hash
 
     exports =
-        path: () -> 
-            molly.type_match arguments,
-                'null': () -> window.location.pathname
-                'string': (path) -> window.location.pathname = path
-        hash: () -> 
-            molly.type_match arguments,
-                'null': () -> window.location.hash
-                'string': (hash) -> 
-                    window.location.hash = hash
-                    molly.events.trigger hash
+        path: (url) -> 
+            window.location.pathname = url if url?
+            window.location.pathname
+        hash: (hash) -> 
+            if hash?
+                window.location.hash = hash if hash?
+                molly.events.trigger window.location.hash
+
+            window.location.hash
 
 
 molly.type_match = (args, methods) ->

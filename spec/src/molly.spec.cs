@@ -59,6 +59,21 @@ describe 'molly', () ->
 
             expect(callback).not.toHaveBeenCalled()
 
+        it 'should only call the current route', () ->
+            callback1 = jasmine.createSpy()
+            callback2 = jasmine.createSpy()
+            spyOn(molly.url_handler, 'path').andReturn '/users/123'
+
+            @app.route
+                '/users': callback1
+                '/users/123': callback2
+
+            @app.run()
+
+            expect(callback1).not.toHaveBeenCalled()
+            expect(callback2).toHaveBeenCalled()
+            
+
         it 'should route multiple urls if passed an object', () ->
             callback1 = jasmine.createSpy()
             callback2 = jasmine.createSpy()
@@ -98,31 +113,10 @@ describe 'molly', () ->
 
             expect(callback2).toHaveBeenCalled()
 
-        it 'should route remove trailing slashes to namespaced urls', () ->
-            callback1 = jasmine.createSpy()
-            callback2 = jasmine.createSpy()
-            spyOn(molly.url_handler, 'path').andReturn '/users/foo'
-
-            @app.route '/users',
-                '/': callback1
-                '/foo/': callback2
-
-            @app.run()
-
-            expect(callback2).toHaveBeenCalled()
-
         it 'should add a leading slash if missing', () ->
             callback = jasmine.createSpy()
             spyOn(molly.url_handler, 'path').andReturn '/foo'
             @app.route 'foo', callback
-            @app.run()
-
-            expect(callback).toHaveBeenCalled()
-
-        it 'should remove trailing slashes', () ->
-            callback = jasmine.createSpy()
-            spyOn(molly.url_handler, 'path').andReturn '/foo'
-            @app.route '/foo/', callback
             @app.run()
 
             expect(callback).toHaveBeenCalled()
@@ -239,3 +233,16 @@ describe 'molly', () ->
             molly.url_handler.hash '#hello'
 
             expect(molly.events.trigger).toHaveBeenCalledWith '#hello'
+            
+    describe 'type_match', () ->
+
+        it 'should call null option if not arguments are provided', () ->
+            callback = jasmine.createSpy()
+            example = () ->
+                molly.type_match arguments,
+                    '': () ->
+                        callback()
+
+            example()
+
+            expect(callback).toHaveBeenCalled()
