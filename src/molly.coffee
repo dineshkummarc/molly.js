@@ -2,14 +2,14 @@
 
     events = molly.events
 
-    add_leading_slash = (str) ->
-        if str[0] != '/' and str[0] != '#' then "/#{ str }" else str
+    add_leading_slash = (url) ->
+        if url[0] != '/' and url[0] != '#' then "/#{ url }" else url
 
-    replace_url_arguments = (str) ->
-        str.replace /:([\w\d]+)/g, "([^\/]+)"
+    replace_url_arguments = (url) ->
+        url.replace /:([\w\d]+)/g, "([^\/]+)"
 
-    parse_url = (str) ->
-        add_leading_slash replace_url_arguments str
+    parse_url = (url) ->
+        add_leading_slash replace_url_arguments url
 
     exports =
         route: () ->
@@ -39,8 +39,9 @@
     if constructor?
         constructor.apply(exports)
         exports.run()
+        return exports
     else 
-        exports
+        return exports
 
 
 molly.events = do ->
@@ -53,8 +54,7 @@ molly.events = do ->
         trigger: (path) ->
             for event, callback of events
                 args = path.match?(event)
-                if args?.length
-                    callback.apply this, args[1..args.length]
+                callback.apply this, args[1..args.length] if args?[0] == path
 
 
 molly.url_handler = do ->

@@ -62,7 +62,7 @@
         spyOn(molly.url_handler, 'path').andReturn('/users/123');
         this.app.route({
           '/users': callback1,
-          '/users/123': callback2
+          '/users/:id': callback2
         });
         this.app.run();
         expect(callback1).not.toHaveBeenCalled();

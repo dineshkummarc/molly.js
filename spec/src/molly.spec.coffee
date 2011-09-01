@@ -66,7 +66,7 @@ describe 'molly', () ->
 
             @app.route
                 '/users': callback1
-                '/users/123': callback2
+                '/users/:id': callback2
 
             @app.run()
 
