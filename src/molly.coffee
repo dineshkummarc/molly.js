@@ -5,9 +5,6 @@
     add_leading_slash = (str) ->
         if str[0] != '/' and str[0] != '#' then "/#{ str }" else str
 
-    remove_trailing_slash = (str) ->
-        if str != '/' and str[str.length - 1] == '/' then str.substring(0, str.length - 1) else str
-
     replace_url_arguments = (str) ->
         str.replace /:([\w\d]+)/g, "([^\/]+)"
 
@@ -56,7 +53,6 @@ molly.events = do ->
         trigger: (path) ->
             for event, callback of events
                 args = path.match?(event)
-                jstestdriver.console.log args, event, path
                 if args?.length
                     callback.apply this, args[1..args.length]
 
