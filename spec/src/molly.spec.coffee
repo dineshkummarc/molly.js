@@ -217,3 +217,41 @@ describe 'molly', () ->
                 expect(molly.url_handler.path).toHaveBeenCalledWith '/foo'
 
             @app.run()
+
+    describe 'config', () ->
+
+        it 'should have a use method', () ->
+            expect(typeof @app.use).toBe 'function'
+
+        it 'should set named properties on route context', () ->
+            spyOn(molly.url_handler, 'path').andReturn '/'
+
+            config =
+                debug: true
+                app_id: 12345
+
+            @app.use 'config', config
+            @app.use 'foo', () -> 'bar'
+
+            @app.route '/', () ->
+                expect(@config.debug).toBe true
+                expect(@config.app_id).toBe 12345
+                expect(@foo()).toBe 'bar'
+
+            @app.run()
+
+        it 'should assign all object values directly if no name is provided', () ->
+            spyOn(molly.url_handler, 'path').andReturn '/'
+
+            @app.use
+                config:
+                    debug: true
+                    app_id: 12345
+                foo: () -> 'bar'
+
+            @app.route '/', () ->
+                expect(@config.debug).toBe true
+                expect(@config.app_id).toBe 12345
+                expect(@foo()).toBe 'bar'
+
+            @app.run()

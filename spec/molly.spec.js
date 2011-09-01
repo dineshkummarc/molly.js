@@ -184,7 +184,7 @@
         return expect(callback).toHaveBeenCalled();
       });
     });
-    return describe('redirect', function() {
+    describe('redirect', function() {
       it('should have a redirect method on route context', function() {
         spyOn(molly.url_handler, 'path').andReturn('/');
         this.app.route('/', function() {
@@ -197,6 +197,47 @@
         this.app.route('/', function() {
           this.redirect('/foo');
           return expect(molly.url_handler.path).toHaveBeenCalledWith('/foo');
+        });
+        return this.app.run();
+      });
+    });
+    return describe('config', function() {
+      it('should have a use method', function() {
+        return expect(typeof this.app.use).toBe('function');
+      });
+      it('should set named properties on route context', function() {
+        var config;
+        spyOn(molly.url_handler, 'path').andReturn('/');
+        config = {
+          debug: true,
+          app_id: 12345
+        };
+        this.app.use('config', config);
+        this.app.use('foo', function() {
+          return 'bar';
+        });
+        this.app.route('/', function() {
+          expect(this.config.debug).toBe(true);
+          expect(this.config.app_id).toBe(12345);
+          return expect(this.foo()).toBe('bar');
+        });
+        return this.app.run();
+      });
+      return it('should assign all object values directly if no name is provided', function() {
+        spyOn(molly.url_handler, 'path').andReturn('/');
+        this.app.use({
+          config: {
+            debug: true,
+            app_id: 12345
+          },
+          foo: function() {
+            return 'bar';
+          }
+        });
+        this.app.route('/', function() {
+          expect(this.config.debug).toBe(true);
+          expect(this.config.app_id).toBe(12345);
+          return expect(this.foo()).toBe('bar');
         });
         return this.app.run();
       });

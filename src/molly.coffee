@@ -30,6 +30,13 @@
                     url = parse_url url
                     events.listen url, callback, context
 
+        use: (name, item) ->
+            if arguments.length == 1
+                for k, v of name
+                    context[k] = v
+            else
+                context[name] = item
+
         run: () ->
             events.trigger molly.url_handler.path()
             events.trigger molly.url_handler.hash()
