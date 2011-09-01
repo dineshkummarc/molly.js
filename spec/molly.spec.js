@@ -185,13 +185,20 @@
       });
     });
     return describe('redirect', function() {
-      return it('should have a redirect method on route context', function() {
+      it('should have a redirect method on route context', function() {
         spyOn(molly.url_handler, 'path').andReturn('/');
         this.app.route('/', function() {
           return expect(typeof this.redirect).toBe('function');
         });
-        this.app.run();
-        return expect(molly.url_handler.path).toHaveBeenCalled();
+        return this.app.run();
+      });
+      return it('should call url_handler.path with a new url', function() {
+        spyOn(molly.url_handler, 'path').andReturn('/');
+        this.app.route('/', function() {
+          this.redirect('/foo');
+          return expect(molly.url_handler.path).toHaveBeenCalledWith('/foo');
+        });
+        return this.app.run();
       });
     });
   });

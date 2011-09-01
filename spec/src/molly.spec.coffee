@@ -206,6 +206,15 @@ describe 'molly', () ->
 
             @app.route '/', () ->
                 expect(typeof @redirect).toBe 'function'
+
             @app.run()
 
-            expect(molly.url_handler.path).toHaveBeenCalled()
+        it 'should call url_handler.path with a new url', () ->
+            spyOn(molly.url_handler, 'path').andReturn '/'
+
+            @app.route '/', () ->
+                @redirect '/foo'
+                expect(molly.url_handler.path).toHaveBeenCalledWith '/foo'
+
+            @app.run()
+
