@@ -11,20 +11,23 @@
     parse_url = (url) ->
         add_leading_slash replace_url_arguments url
 
+    context =
+        redirect: () ->
+
     exports =
         route: () ->
             molly.type_match arguments,
                 'object': (urls) ->
                     for url, callback of urls
                         url = parse_url url
-                        events.listen url, callback
+                        events.listen url, callback, context
                 'string, object': (prefix, urls) ->
                     for url, callback of urls
                         url = parse_url "#{ prefix }#{ add_leading_slash url }"
-                        events.listen url, callback
+                        events.listen url, callback, context
                 'string, function': (url, callback) ->
                     url = parse_url url
-                    events.listen url, callback
+                    events.listen url, callback, context
 
         run: () ->
             events.trigger molly.url_handler.path()
@@ -41,13 +44,13 @@ molly.events = do ->
     events = {}
 
     exports =
-        listen: (event, callback) ->
-            events[event] = callback
+        listen: (event, callback, context) ->
+            events[event] = { 'callback': callback, 'context': context }
 
         trigger: (path) ->
-            for event, callback of events
+            for event, method of events
                 args = path.match?(event)
-                callback.apply this, args[1..args.length] if args?[0] == path
+                method.callback.apply method.context, args[1..args.length] if args?[0] == path
 
 
 molly.url_handler = do ->

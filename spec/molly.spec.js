@@ -169,7 +169,7 @@
         return expect(molly.events.trigger).toHaveBeenCalledWith('#hello');
       });
     });
-    return describe('type_match', function() {
+    describe('type_match', function() {
       return it('should call null option if not arguments are provided', function() {
         var callback, example;
         callback = jasmine.createSpy();
@@ -182,6 +182,16 @@
         };
         example();
         return expect(callback).toHaveBeenCalled();
+      });
+    });
+    return describe('redirect', function() {
+      return it('should have a redirect method on route context', function() {
+        spyOn(molly.url_handler, 'path').andReturn('/');
+        this.app.route('/', function() {
+          return expect(typeof this.redirect).toBe('function');
+        });
+        this.app.run();
+        return expect(molly.url_handler.path).toHaveBeenCalled();
       });
     });
   });

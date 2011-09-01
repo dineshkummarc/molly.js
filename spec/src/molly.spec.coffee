@@ -198,3 +198,14 @@ describe 'molly', () ->
             example()
 
             expect(callback).toHaveBeenCalled()
+
+    describe 'redirect', () ->
+
+        it 'should have a redirect method on route context', () ->
+            spyOn(molly.url_handler, 'path').andReturn '/'
+
+            @app.route '/', () ->
+                expect(typeof @redirect).toBe 'function'
+            @app.run()
+
+            expect(molly.url_handler.path).toHaveBeenCalled()
