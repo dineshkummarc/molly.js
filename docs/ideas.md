@@ -60,32 +60,11 @@
             # all routes mentioning python
 
 
-
-## Config
-
-    config =
-        debug: true
-        speed: 500
-        app_id: 123456789012
-
-    molly ->
-
-        @use moustache, underscore
-        @use my_special_markdown_parser, 'parse_markdown'
-        @use config
-
-        @route '/', ->
-            @render 'some template'
-            @map tweet, some_tweets
-            @parse_markdown '# Heading'
-
-
 ## Plugins
 
     molly ->
 
-        # overrides default resource function
-        @use custom_resource, 'resource'
+        @use resource
         @use verbs
 
         @get '/', ->
@@ -101,7 +80,7 @@
             'recent': ->
 
 
-## Sessions (plugin?)
+## Sessions
 
     molly ->
 
@@ -109,16 +88,3 @@
 
         @route '/users/:id', (id) ->
             @session['current_user'] = id
-
-
-## Redirects
-
-    molly ->
-
-        @route '/secret-area', () ->
-            if not logged_in then @redirect '/'
-
-        @route '/become-a-member-today', sign_up
-
-        @route '/members-only', () ->
-            if not logged_in then @redirect @url_for sign_up
