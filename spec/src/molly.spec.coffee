@@ -217,4 +217,3 @@ describe 'molly', () ->
                 expect(molly.url_handler.path).toHaveBeenCalledWith '/foo'
 
             @app.run()
-

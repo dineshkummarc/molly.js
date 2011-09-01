@@ -12,7 +12,8 @@
         add_leading_slash replace_url_arguments url
 
     context =
-        redirect: () ->
+        redirect: (url) ->
+            molly.url_handler.path url
 
     exports =
         route: () ->
