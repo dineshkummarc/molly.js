@@ -24,17 +24,6 @@
       });
       return expect(callback).toHaveBeenCalled();
     });
-    it('should register resources from the constructor function', function() {
-      var callback;
-      callback = jasmine.createSpy();
-      spyOn(molly.url_handler, 'path').andReturn('/users');
-      molly(function() {
-        return this.resource('users', {
-          index: callback
-        });
-      });
-      return expect(callback).toHaveBeenCalled();
-    });
     describe('route', function() {
       it('should have a route method on the returned object', function() {
         return expect(typeof this.app.route).toBe('function');
@@ -143,46 +132,6 @@
         this.app.route('#users/:id', callback);
         this.app.run();
         return expect(callback).toHaveBeenCalledWith('123');
-      });
-    });
-    describe('resource', function() {
-      beforeEach(function() {
-        return spyOn(this.app, 'route');
-      });
-      it('should have a resource function', function() {
-        return expect(typeof this.app.resource).toBe('function');
-      });
-      it('should create an index route for the resource', function() {
-        var callback;
-        callback = jasmine.createSpy();
-        this.app.resource('users', {
-          index: callback
-        });
-        return expect(this.app.route).toHaveBeenCalledWith('users', callback);
-      });
-      it('should create a show route for the resource', function() {
-        var callback;
-        callback = jasmine.createSpy();
-        this.app.resource('users', {
-          show: callback
-        });
-        return expect(this.app.route).toHaveBeenCalledWith('users/:id', callback);
-      });
-      it('should create an edit route for the resource', function() {
-        var callback;
-        callback = jasmine.createSpy();
-        this.app.resource('users', {
-          edit: callback
-        });
-        return expect(this.app.route).toHaveBeenCalledWith('users/:id/edit', callback);
-      });
-      return it('should create a delete route for the resource', function() {
-        var callback;
-        callback = jasmine.createSpy();
-        this.app.resource('users', {
-          destroy: callback
-        });
-        return expect(this.app.route).toHaveBeenCalledWith('users/:id/destroy', callback);
       });
     });
     describe('run', function() {

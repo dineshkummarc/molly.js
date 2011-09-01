@@ -26,17 +26,6 @@ describe 'molly', () ->
 
         expect(callback).toHaveBeenCalled()
 
-    it 'should register resources from the constructor function', () ->
-        callback = jasmine.createSpy()
-        spyOn(molly.url_handler, 'path').andReturn '/users'
-
-        molly () ->
-            
-            @resource 'users',
-                index: callback
-
-        expect(callback).toHaveBeenCalled()
-
 
     describe 'route', () ->
 
@@ -156,43 +145,6 @@ describe 'molly', () ->
             @app.run()
 
             expect(callback).toHaveBeenCalledWith('123')
-
-
-    describe 'resource', () ->
-
-        beforeEach () ->
-            spyOn(@app, 'route')
-
-        it 'should have a resource function', () ->
-            expect(typeof @app.resource).toBe 'function'
-
-        it 'should create an index route for the resource', () ->
-            callback = jasmine.createSpy()
-            @app.resource 'users',
-                index: callback
-
-            expect(@app.route).toHaveBeenCalledWith('users', callback) 
-
-        it 'should create a show route for the resource', () ->
-            callback = jasmine.createSpy()
-            @app.resource 'users',
-                show: callback
-
-            expect(@app.route).toHaveBeenCalledWith('users/:id', callback) 
-
-        it 'should create an edit route for the resource', () ->
-            callback = jasmine.createSpy()
-            @app.resource 'users',
-                edit: callback
-
-            expect(@app.route).toHaveBeenCalledWith('users/:id/edit', callback) 
-
-        it 'should create a delete route for the resource', () ->
-            callback = jasmine.createSpy()
-            @app.resource 'users',
-                destroy: callback
-
-            expect(@app.route).toHaveBeenCalledWith('users/:id/destroy', callback) 
             
 
     describe 'run', () ->

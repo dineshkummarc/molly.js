@@ -26,22 +26,15 @@
                     url = parse_url url
                     events.listen url, callback
 
-        resource: (name, obj) ->
-            @route name, obj.index
-            @route "#{ name }/:id", obj.show
-            @route "#{ name }/:id/edit", obj.edit
-            @route "#{ name }/:id/destroy", obj.destroy
-
         run: () ->
             events.trigger molly.url_handler.path()
             events.trigger molly.url_handler.hash()
     
-    if constructor?
+    if constructor
         constructor.apply(exports)
         exports.run()
-        return exports
-    else 
-        return exports
+        
+    return exports
 
 
 molly.events = do ->
@@ -63,14 +56,14 @@ molly.url_handler = do ->
 
     exports =
         path: (url) -> 
-            window.location.pathname = url if url?
-            window.location.pathname
+            window.location.pathname = url if url
+            return window.location.pathname
         hash: (hash) -> 
-            if hash?
-                window.location.hash = hash if hash?
+            if hash
+                window.location.hash = hash
                 molly.events.trigger window.location.hash
 
-            window.location.hash
+            return window.location.hash
 
 
 molly.type_match = (args, methods) ->
