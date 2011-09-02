@@ -6,7 +6,7 @@ Using a constructor function.
 
     molly ->
     
-        @use 'users', users.all()
+        @use 'users', site.users
         
         @route '/', ->
             console.log "You're on the home page"
@@ -19,9 +19,9 @@ Using a constructor function.
                 console.log "all users"
 
             '/:id': (id) ->
-                user = @users[id]
+                user = @users.get id
                 @redirect '/users' if not user
-                console.log "You're user number #{id}"
+                console.log "Hello #{ user.name }"
 
             '/:id/edit': (id) ->
                 console.log "Do you want to edit user #{id}"
@@ -34,7 +34,7 @@ Or call methods on an app instance.
 
     app = molly()
     
-    app.use 'users', users.all()
+    app.use 'users', site.users
 
     app.route '/', ->
         console.log "You're on the home page"
@@ -47,9 +47,9 @@ Or call methods on an app instance.
             console.log "all users"
 
         '/:id': (id) -> 
-            user = @users[id]
+            user = @users.get id
             @redirect '/users' if not user
-            console.log "You're user number #{id}"
+            console.log "Hello #{ user.name }"
 
         '/:id/edit': (id) ->
             console.log "Do you want to edit user #{id}"
