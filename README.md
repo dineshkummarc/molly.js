@@ -24,19 +24,6 @@ Using a constructor function.
 
             '/:id/destroy': (id) ->
                 console.log "Do you want to delete user #{id}"
-        
-        @resource 'users',
-            index: -> 
-                console.log "all users"
-
-            show: (id) -> 
-                console.log "You're user number #{id}"
-
-            edit: (id) ->
-                console.log "Do you want to edit user #{id}"
-
-            destroy: (id) ->
-                console.log "Do you want to delete user #{id}"
                 
 
 Or call methods on an app instance.
@@ -61,19 +48,6 @@ Or call methods on an app instance.
             console.log "Do you want to edit user #{id}"
 
         '/:id/destroy': (id) ->
-            console.log "Do you want to delete user #{id}"
-
-    app.resource 'users',
-        index: -> 
-            console.log "all users"
-
-        show: (id) -> 
-            console.log "You're user number #{id}"
-
-        edit: (id) ->
-            console.log "Do you want to edit user #{id}"
-
-        destroy: (id) ->
             console.log "Do you want to delete user #{id}"
 
 
