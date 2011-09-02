@@ -5,6 +5,8 @@ Simple routing for client-side apps.
 Using a constructor function.
 
     molly ->
+    
+        @use 'users', users.all()
         
         @route '/', ->
             console.log "You're on the home page"
@@ -16,7 +18,9 @@ Using a constructor function.
             '/': -> 
                 console.log "all users"
 
-            '/:id': (id) -> 
+            '/:id': (id) ->
+                user = @users[id]
+                @redirect '/users' if not user
                 console.log "You're user number #{id}"
 
             '/:id/edit': (id) ->
@@ -29,7 +33,8 @@ Using a constructor function.
 Or call methods on an app instance.
 
     app = molly()
-
+    
+    app.use 'users', users.all()
 
     app.route '/', ->
         console.log "You're on the home page"
@@ -42,6 +47,8 @@ Or call methods on an app instance.
             console.log "all users"
 
         '/:id': (id) -> 
+            user = @users[id]
+            @redirect '/users' if not user
             console.log "You're user number #{id}"
 
         '/:id/edit': (id) ->
@@ -52,3 +59,5 @@ Or call methods on an app instance.
 
 
     app.run()
+    
+
