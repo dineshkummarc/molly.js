@@ -1,15 +1,3 @@
-## Chained callbacks
-
-    molly ->
-       
-        @route '/', login_to_facebook, find_friends, () ->
-            # do something
-
-        login = [ login_to_facebook, login_to_twitter ]
-
-        @route '/', login, find_friends, () ->
-
-
 ## Type matching
 
     molly ->
@@ -78,13 +66,3 @@
             'single': (name) ->
             'change': (name) ->
             'recent': ->
-
-
-## Sessions
-
-    molly ->
-
-        @use sessions
-
-        @route '/users/:id', (id) ->
-            @session['current_user'] = id
