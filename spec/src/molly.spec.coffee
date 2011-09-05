@@ -145,6 +145,18 @@ describe 'molly', () ->
             @app.run()
 
             expect(callback).toHaveBeenCalledWith('123')
+
+        it 'should allow mulitple callbacks to be registered', () -<
+            callback = jasmine.createSpy()
+            second_callback = jasmine.createSpy()
+            spyOn(molly.url_handler, 'hash').andReturn '/'
+
+            @app.route '/', callback, second_callback
+            @app.run()
+
+            expect(callback).toHaveBeenCalled()
+            expect(callback2).toHaveBeenCalled()
+
             
 
     describe 'run', () ->
