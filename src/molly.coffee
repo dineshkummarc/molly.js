@@ -26,9 +26,10 @@
                     for url, callback of urls
                         url = parse_url "#{ prefix }#{ add_leading_slash url }"
                         events.listen url, callback, context
-                'string, function': (url, callback) ->
+                '*': (url, callbacks...) ->
                     url = parse_url url
-                    events.listen url, callback, context
+                    for callback in _.flatten callbacks
+                        events.listen url, callback, context
 
         use: (name, item) ->
             if arguments.length == 1
@@ -53,12 +54,17 @@ molly.events = do ->
 
     exports =
         listen: (event, callback, context) ->
-            events[event] = { 'callback': callback, 'context': context }
+            if not events[event]
+                events[event] = []
+
+            events[event].push { 'callback': callback, 'context': context }
 
         trigger: (path) ->
-            for event, method of events
+            for event, methods of events
                 args = path.match?(event)
-                method.callback.apply method.context, args[1..args.length] if args?[0] == path
+
+                for method in methods
+                    method.callback.apply method.context, args[1..args.length] if args?[0] == path
 
 
 molly.url_handler = do ->
@@ -81,4 +87,7 @@ molly.type_match = (args, methods) ->
     arg_types = (typeof arg for arg in args).join ", "
 
     for types, method of methods
-        method.apply this, args if types == arg_types
+        types = types.replace 'array', 'object'
+        return method.apply this, args if types == arg_types
+    
+    return methods['*']?.apply this, args

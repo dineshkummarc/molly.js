@@ -125,13 +125,36 @@
         this.app.run();
         return expect(callback).toHaveBeenCalled();
       });
-      return it('should allow url parameters in hash urls', function() {
+      it('should allow url parameters in hash urls', function() {
         var callback;
         callback = jasmine.createSpy();
         spyOn(molly.url_handler, 'hash').andReturn('#users/123');
         this.app.route('#users/:id', callback);
         this.app.run();
         return expect(callback).toHaveBeenCalledWith('123');
+      });
+      it('should allow arrays of callbacks to be passed', function() {
+        var callback, second_callback;
+        callback = jasmine.createSpy();
+        second_callback = jasmine.createSpy();
+        spyOn(molly.url_handler, 'hash').andReturn('/');
+        this.app.route('/', callback, second_callback);
+        this.app.run();
+        expect(callback).toHaveBeenCalled();
+        return expect(second_callback).toHaveBeenCalled();
+      });
+      return it('should allow nested arrays of callbacks to be passed', function() {
+        var callback, login, second_callback, third_callback;
+        callback = jasmine.createSpy();
+        second_callback = jasmine.createSpy();
+        third_callback = jasmine.createSpy();
+        spyOn(molly.url_handler, 'hash').andReturn('/');
+        login = [callback, second_callback];
+        this.app.route('/', login, third_callback);
+        this.app.run();
+        expect(callback).toHaveBeenCalled();
+        expect(second_callback).toHaveBeenCalled();
+        return expect(third_callback).toHaveBeenCalled();
       });
     });
     describe('run', function() {
@@ -170,12 +193,38 @@
       });
     });
     describe('type_match', function() {
+      it('should match argument types passed in', function() {
+        var callback, example;
+        callback = jasmine.createSpy();
+        example = function() {
+          return molly.type_match(arguments, {
+            'string, function, string': function(message, method, goodbye) {
+              return method(message, goodbye);
+            }
+          });
+        };
+        example('hello', callback, 'world');
+        return expect(callback).toHaveBeenCalledWith('hello', 'world');
+      });
+      it('should convert array to object', function() {
+        var callback, example;
+        callback = jasmine.createSpy();
+        example = function() {
+          return molly.type_match(arguments, {
+            'array': function() {
+              return callback();
+            }
+          });
+        };
+        example([1, 2, 3]);
+        return expect(callback).toHaveBeenCalled();
+      });
       return it('should call null option if not arguments are provided', function() {
         var callback, example;
         callback = jasmine.createSpy();
         example = function() {
           return molly.type_match(arguments, {
-            '': function() {
+            '*': function() {
               return callback();
             }
           });

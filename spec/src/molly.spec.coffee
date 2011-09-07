@@ -146,7 +146,7 @@ describe 'molly', () ->
 
             expect(callback).toHaveBeenCalledWith('123')
 
-        it 'should allow mulitple callbacks to be registered', () -<
+        it 'should allow arrays of callbacks to be passed', () ->
             callback = jasmine.createSpy()
             second_callback = jasmine.createSpy()
             spyOn(molly.url_handler, 'hash').andReturn '/'
@@ -155,9 +155,23 @@ describe 'molly', () ->
             @app.run()
 
             expect(callback).toHaveBeenCalled()
-            expect(callback2).toHaveBeenCalled()
+            expect(second_callback).toHaveBeenCalled()
 
-            
+        it 'should allow nested arrays of callbacks to be passed', () ->
+            callback = jasmine.createSpy()
+            second_callback = jasmine.createSpy()
+            third_callback = jasmine.createSpy()
+            spyOn(molly.url_handler, 'hash').andReturn '/'
+
+            login = [callback, second_callback]
+
+            @app.route '/', login, third_callback
+            @app.run()
+
+            expect(callback).toHaveBeenCalled()
+            expect(second_callback).toHaveBeenCalled()
+            expect(third_callback).toHaveBeenCalled()
+
 
     describe 'run', () ->
 
@@ -197,14 +211,37 @@ describe 'molly', () ->
             molly.url_handler.hash '#hello'
 
             expect(molly.events.trigger).toHaveBeenCalledWith '#hello'
+
             
     describe 'type_match', () ->
+
+        it 'should match argument types passed in', () ->
+            callback = jasmine.createSpy()
+            example = () ->
+                molly.type_match arguments,
+                    'string, function, string': (message, method, goodbye) ->
+                        method(message, goodbye)
+
+            example('hello', callback, 'world')
+
+            expect(callback).toHaveBeenCalledWith('hello', 'world')
+
+        it 'should convert array to object', () ->
+            callback = jasmine.createSpy()
+            example = () ->
+                molly.type_match arguments,
+                    'array': () ->
+                        callback()
+
+            example([1, 2, 3])
+
+            expect(callback).toHaveBeenCalled()
 
         it 'should call null option if not arguments are provided', () ->
             callback = jasmine.createSpy()
             example = () ->
                 molly.type_match arguments,
-                    '': () ->
+                    '*': () ->
                         callback()
 
             example()
