@@ -31,12 +31,13 @@
                     for callback in _.flatten callbacks
                         events.listen url, callback, context
 
-        use: (name, item) ->
-            if arguments.length == 1
-                for k, v of name
-                    context[k] = v
-            else
-                context[name] = item
+        use: () ->
+            molly.type_match arguments,
+                'object': (config) ->
+                    for k, v of config
+                        context[k] = v
+                '*': (name, item) ->
+                    context[name] = item
 
         run: () ->
             events.trigger molly.url_handler.path()
@@ -54,9 +55,7 @@ molly.events = do ->
 
     exports =
         listen: (event, callback, context) ->
-            if not events[event]
-                events[event] = []
-
+            events[event] = [] if not events[event]
             events[event].push { 'callback': callback, 'context': context }
 
         trigger: (path) ->
@@ -73,14 +72,19 @@ molly.url_handler = do ->
 
     exports =
         path: (url) -> 
-            window.location.pathname = url if url
-            return window.location.pathname
-        hash: (hash) -> 
-            if hash
-                window.location.hash = hash
-                molly.events.trigger window.location.hash
+            molly.type_match arguments,
+                'string': (url) ->
+                    window.location.pathname = url
+                '*': ->
+                    window.location.pathname
 
-            return window.location.hash
+        hash: () -> 
+            molly.type_match arguments,
+                'string': (hash) ->
+                    window.location.hash = hash
+                    molly.events.trigger window.location.hash
+                '*': ->
+                    window.location.hash
 
 
 molly.type_match = (args, methods) ->
