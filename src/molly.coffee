@@ -28,7 +28,7 @@
                         events.listen url, callback, context
                 '*': (url, callbacks...) ->
                     url = parse_url url
-                    for callback in _.flatten callbacks
+                    for callback in [].concat callbacks...
                         events.listen url, callback, context
 
         use: () ->
@@ -76,7 +76,7 @@ molly.url_handler = do ->
                 'string': (url) ->
                     window.location.pathname = url
                 '*': ->
-                    window.location.pathname
+                    return window.location.pathname
 
         hash: () -> 
             molly.type_match arguments,
@@ -84,7 +84,7 @@ molly.url_handler = do ->
                     window.location.hash = hash
                     molly.events.trigger window.location.hash
                 '*': ->
-                    window.location.hash
+                    return window.location.hash
 
 
 molly.type_match = (args, methods) ->
